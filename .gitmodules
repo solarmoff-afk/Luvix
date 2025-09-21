@@ -1,3 +1,12 @@
 [submodule "ducker"]
 	path = engine
 	url = https://github.com/solarmoff-afk/Ducker.git
+[submodule "containers/desktop/external/glfw"]
+	path = containers/desktop/external/glfw
+	url = https://github.com/solarmoff-afk/GLFW3.git
+[submodule "containers/desktop/external/glad"]
+	path = containers/desktop/external/glad
+	url = https://github.com/solarmoff-afk/Glad-3.1
+[submodule "containers/desktop/external/luajit"]
+	path = containers/desktop/external/luajit
+	url = https://github.com/solarmoff-afk/LuaJIT-fork.git

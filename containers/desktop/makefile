@@ -53,12 +53,22 @@ ifneq ($(OS),Windows_NT)
     endif
 endif
 
-CXX_SRCS = Main.cpp
+CXX_SRCS = Main.cpp \
+			runtime.cpp
+
 C_SRCS = $(GLAD_DIR)/src/glad.c
 
-CXX_OBJS = $(BUILD_DIR)/Main.o
-C_OBJS = $(BUILD_DIR)/glad.o
+CXX_OBJS = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(CXX_SRCS))
+C_OBJS = $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(C_SRCS)))
 OBJS = $(CXX_OBJS) $(C_OBJS)
+
+$(BUILD_DIR)/%.o: %.cpp
+	@echo Compiling C++: $<
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.o: $(GLAD_DIR)/src/%.c
+	@echo Compiling C: $<
+	$(CC) $(CFLAGS) -c $< -o $@
 
 all: $(TARGET)
 
@@ -68,14 +78,6 @@ $(TARGET): prepare_dirs $(OBJS)
 
 prepare_dirs:
 	@if not exist $(BUILD_DIR) $(MKDIR_CMD) $(BUILD_DIR)
-
-$(BUILD_DIR)/Main.o: Main.cpp
-	@echo Compiling C++: $<
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-$(BUILD_DIR)/glad.o: $(GLAD_DIR)/src/glad.c
-	@echo Compiling C: $<
-	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	@echo Cleaning project...

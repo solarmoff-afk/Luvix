@@ -8,14 +8,10 @@
 #include <iostream>
 #include <vector>
 
+#include "headers/runtime.h"
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
-
-extern "C" {
-    #include <lua.h>
-    #include <lauxlib.h>
-    #include <lualib.h>
-}
 
 /*
     Эта функция нужна для получения имени файла из аргумента. Это
@@ -169,39 +165,27 @@ int main(int argc, char* argv[]) {
     glfwSwapInterval(1);
     
     /*
-        Создаём состояние Lua
+        Создаём рантайм и исполняем бандл
     */
 
-    lua_State* L = luaL_newstate();
-    if (!L) {
-        logDebug("[FATAL] Lua can't create state, exit...");
-        
+    LxRuntime runtime;
+    int result = runtime.boot("engine.bundle.lua", window);
+
+    if (result == -1) {    
+        logDebug("[INFO] Can't create LuaState");
+
         glfwDestroyWindow(window);
         glfwTerminate();
         return -1;
     }
 
-    /*
-        Подкоючаем стандартные библиотеки lua, Такие как math.*,
-        system.*, os.*, io.* и так далее
-    */
-
-    luaL_openlibs(L);
-    logDebug("[INFO] Lua state created and libs included");
-
-    const char* lua_file = "engine.bundle.lua";
-    int result = luaL_dofile(L, lua_file);
-
     while (!glfwWindowShouldClose(window)) {
-        
-
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
 
     logDebug("[INFO] Window close");
 
-    lua_close(L);
     glfwDestroyWindow(window);
     glfwTerminate();
 

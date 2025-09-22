@@ -54,7 +54,8 @@ ifneq ($(OS),Windows_NT)
 endif
 
 CXX_SRCS = Main.cpp \
-			runtime.cpp
+			runtime.cpp \
+			external/utf8/lutf8lib.cpp
 
 C_SRCS = $(GLAD_DIR)/src/glad.c
 
@@ -63,10 +64,12 @@ C_OBJS = $(patsubst %.c, $(BUILD_DIR)/%.o, $(notdir $(C_SRCS)))
 OBJS = $(CXX_OBJS) $(C_OBJS)
 
 $(BUILD_DIR)/%.o: %.cpp
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
 	@echo Compiling C++: $<
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/%.o: $(GLAD_DIR)/src/%.c
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
 	@echo Compiling C: $<
 	$(CC) $(CFLAGS) -c $< -o $@
 

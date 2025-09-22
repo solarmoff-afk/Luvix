@@ -16,3 +16,5 @@ local id2 = runtime.addEventListener("resizeWindow", function(event)
 end)
 
 print(id1, id2)
+
+print(utf8)

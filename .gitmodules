@@ -10,3 +10,6 @@
 [submodule "containers/desktop/external/luajit"]
 	path = containers/desktop/external/luajit
 	url = https://github.com/solarmoff-afk/LuaJIT-fork.git
+[submodule "containers/desktop/external/utf8"]
+	path = containers/desktop/external/utf8
+	url = https://github.com/solarmoff-afk/Lua53-utf8.git

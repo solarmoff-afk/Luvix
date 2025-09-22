@@ -10,6 +10,8 @@ extern "C" {
     #include <lua.h>
     #include <lauxlib.h>
     #include <lualib.h>
+    
+    int luaopen_utf8(lua_State* L);
 }
 
 struct GLFWwindow;

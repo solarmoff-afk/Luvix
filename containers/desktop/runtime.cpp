@@ -81,6 +81,14 @@ int LxRuntime::boot(const std::string& bootFile) {
     luaL_openlibs(m_lua);
 
     /*
+        Добавляем аддоны, их список:
+            1. utf8
+    */
+
+    luaopen_utf8(m_lua);
+    lua_setglobal(m_lua, "utf8");
+
+    /*
         Сохраняем указатель на текущий экземпляр LxRuntime в реестр,
         чтобы статические C функции могли к нему обратиться
     */

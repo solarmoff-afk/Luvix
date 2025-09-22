@@ -29,10 +29,16 @@ std::string getWindowTitleFromExecutable(char* argv0) {
 
 /*
     Переменные для хранения актуальных размеров окна
-*/
-
+    */
+    
 int widthScreen = WINDOW_WIDTH;
 int heightScreen = WINDOW_HEIGHT;
+
+/*
+    Глобальная переменная для хранения объекта класса рантайма
+*/
+
+LxRuntime runtime;
 
 /*
     Функция, которая вызывает при изменении размера окна
@@ -52,6 +58,7 @@ void windowResize(int x, int y) {
     // glViewport(0, 0, x, y);
 }
 
+
 /*
     Функция, которую GLFW автоматически вызывает при изменении размеров
     окна.
@@ -60,6 +67,13 @@ void windowResize(int x, int y) {
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     widthScreen = width;
     heightScreen = height;
+
+    /*
+        Вызываем слушатели изменения окна
+        (Если в луа коде была подписка на них)
+    */
+
+    runtime.callResizeWindowEvents(width, height);
     
     windowResize(width, height);
 }
@@ -136,7 +150,8 @@ int main(int argc, char* argv[]) {
     #endif
 
     /*
-
+        Устанавливаем такой же заговолок окна как и имя
+        запускаемого файла
     */
 
     std::string windowTitle = getWindowTitleFromExecutable(argv[0]);
@@ -163,13 +178,19 @@ int main(int argc, char* argv[]) {
     */
 
     glfwSwapInterval(1);
-    
+
+    /*
+        Привязываем событие изменения окна к функции
+    */
+
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    windowResize(WINDOW_WIDTH, WINDOW_HEIGHT);
+
     /*
         Создаём рантайм и исполняем бандл
     */
 
-    LxRuntime runtime;
-    int result = runtime.boot("engine.bundle.lua", window);
+    int result = runtime.boot("engine.bundle.lua");
 
     if (result == -1) {    
         logDebug("[INFO] Can't create LuaState");
@@ -180,7 +201,7 @@ int main(int argc, char* argv[]) {
     }
 
     while (!glfwWindowShouldClose(window)) {
-        runtime.callEnterFrameEvents(1.0, 1, 1);
+        runtime.callEnterFrameEvents(1.0, widthScreen, heightScreen);
         
         glfwPollEvents();
         glfwSwapBuffers(window);

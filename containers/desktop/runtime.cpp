@@ -62,7 +62,7 @@ LxRuntime::~LxRuntime() {
     на GLFW окно для передачи информации о его размерах и так далее
 */
 
-int LxRuntime::boot(const std::string& bootFile, GLFWwindow* window) {
+int LxRuntime::boot(const std::string& bootFile) {
     /*
         Создаём состояние Lua
     */
@@ -160,6 +160,18 @@ void LxRuntime::callEnterFrameEvents(double time, int width, int height) {
 }
 
 /*
+    При изменении размеров окна вызываем соответсвующие слушатели
+*/
+
+void LxRuntime::callResizeWindowEvents(int width, int height) {
+    safeCallListeners(m_resizeWindowEvents, "resizeWindow", [&](lua_State* L) {
+        lua_newtable(L);
+        lua_pushstring(L, "width"); lua_pushnumber(L, width); lua_settable(L, -3);
+        lua_pushstring(L, "height"); lua_pushnumber(L, height); lua_settable(L, -3);
+    });
+}
+
+/*
     Закрывает состояние Lua
 */
 
@@ -197,6 +209,8 @@ int LxRuntime::l_addEventListener(lua_State* L) {
     EventType type;
     if (strcmp(eventName, "enterFrame") == 0) {
         type = EventType::EnterFrame;
+    } else if (strcmp(eventName, "resizeWindow") == 0) {
+        type = EventType::ResizeWindow;
     } else {
         return luaL_error(L, "Unknown event type: %s", eventName);
     }
@@ -216,6 +230,10 @@ int LxRuntime::l_addEventListener(lua_State* L) {
     switch (type) {
         case EventType::EnterFrame:
             runtime->m_enterFrameEvents.push_back(newEvent);
+            break;
+
+        case EventType::ResizeWindow:
+            runtime->m_resizeWindowEvents.push_back(newEvent);
             break;
     }
 

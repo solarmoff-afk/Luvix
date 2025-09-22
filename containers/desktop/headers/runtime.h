@@ -16,6 +16,7 @@ struct GLFWwindow;
 
 enum class EventType {
     EnterFrame,
+    ResizeWindow
 };
 
 typedef struct {
@@ -33,9 +34,11 @@ class LxRuntime {
         LxRuntime();
         ~LxRuntime();
         
-        int boot(const std::string& bootFile, GLFWwindow* window);
+        int boot(const std::string& bootFile);
         void close();
+  
         void callEnterFrameEvents(double time, int width, int height);
+        void callResizeWindowEvents(int width, int height);
 
     private:
         lua_State* m_lua;
@@ -45,4 +48,5 @@ class LxRuntime {
         void safeCallListeners(std::vector<LxEvent>& listeners, const char* eventName, std::function<void(lua_State*)> pushArgs);
 
         std::vector<LxEvent> m_enterFrameEvents;
+        std::vector<LxEvent> m_resizeWindowEvents;
 };

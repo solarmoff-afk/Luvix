@@ -94,6 +94,7 @@ int LxRuntime::boot(const std::string& bootFile) {
 
     registerGlobalTable("runtime", m_lua);
     addFunctionToTable("runtime", "addEventListener", LxRuntime::l_addEventListener, m_lua);
+    addFunctionToTable("runtime", "removeEventListener", LxRuntime::l_removeEventListener, m_lua);
 
     luaL_dofile(m_lua, bootFile.c_str());
 
@@ -120,8 +121,8 @@ void LxRuntime::safeCallListeners(std::vector<LxEvent>& listeners, const char* e
         */
         
         lua_rawgeti(L, LUA_REGISTRYINDEX, event.ref);
-        
-        if (lua_isnil(L, -1)) {
+       
+        if (lua_isnil(L, -1) || !event.isValid()) {
             /*
                 Очищаем ссылку, если она больше неактуальная 
                 (Помогает избежать падения во время выполнения)
@@ -189,7 +190,7 @@ void LxRuntime::close() {
 
     2 аргумент - функция с аргументом event которая будет вызываться
 
-    Всегда возвращает 0 (0 аргументов Lua)
+    Всегда возвращает 1 (1 значение Lua)
 */
 
 int LxRuntime::l_addEventListener(lua_State* L) {
@@ -235,6 +236,50 @@ int LxRuntime::l_addEventListener(lua_State* L) {
         case EventType::ResizeWindow:
             runtime->m_resizeWindowEvents.push_back(newEvent);
             break;
+    }
+
+    lua_pushinteger(L, newEvent.id);
+
+    return 1;
+}
+
+/*
+    Статичная функция хелпер для поиска и пометки элемента в векторе
+    как невалидного по его id
+*/
+
+static void removeFromVector(std::vector<LxEvent>* vector, int id) {
+    for (size_t i = 0; i < vector->size(); ++i) {
+        if ((*vector)[i].id == id) {
+            (*vector)[i].makeInvalid();
+            
+            return;
+        }
+    }
+}
+
+/*
+    Метод для отписки от события
+*/
+
+int LxRuntime::l_removeEventListener(lua_State* L) {    
+    lua_getfield(L, LUA_REGISTRYINDEX, LX_RUNTIME_KEY);
+    LxRuntime* runtime = static_cast<LxRuntime*>(lua_touserdata(L, -1));
+    lua_pop(L, 1);
+
+    if (!runtime) {
+        return luaL_error(L, "Could not find LxRuntime instance.");
+    }
+    
+    const char* eventName = luaL_checkstring(L, 1);
+    int id = luaL_checkinteger(L, 2);
+
+    if (strcmp(eventName, "enterFrame") == 0) {
+        removeFromVector(&(runtime->m_enterFrameEvents), id);
+    } else if (strcmp(eventName, "resizeWindow") == 0) {
+        removeFromVector(&(runtime->m_enterFrameEvents), id);
+    } else {
+        return luaL_error(L, "Unknown event type: %s", eventName);
     }
 
     return 0;

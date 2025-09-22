@@ -21,11 +21,21 @@ enum class EventType {
 
 typedef struct {
     int ref;
-    int id;    
+    int id;
     lua_State* L;
 
     bool isValid() const {
         return L != nullptr && id >= 0 && ref != LUA_REFNIL && ref != LUA_NOREF;
+    }
+
+    void makeInvalid() {
+        if (!isValid()) {
+            return;
+        }
+        
+        ref = LUA_NOREF;
+        id = 0;
+        L = nullptr;
     }
 } LxEvent;
 
@@ -44,6 +54,7 @@ class LxRuntime {
         lua_State* m_lua;
         
         static int l_addEventListener(lua_State* L);
+        static int l_removeEventListener(lua_State* L);
 
         void safeCallListeners(std::vector<LxEvent>& listeners, const char* eventName, std::function<void(lua_State*)> pushArgs);
 

@@ -201,7 +201,7 @@ int main(int argc, char* argv[]) {
     }
 
     while (!glfwWindowShouldClose(window)) {
-        runtime.callEnterFrameEvents(1.0, widthScreen, heightScreen);
+        runtime.callEnterFrameEvents(glfwGetTime(), widthScreen, heightScreen);
         
         glfwPollEvents();
         glfwSwapBuffers(window);

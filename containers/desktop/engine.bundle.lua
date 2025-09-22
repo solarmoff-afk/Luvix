@@ -1,12 +1,18 @@
 print("Hello world!")
 
--- runtime.addEventListener("enterFrame", function(event)
---     print(123)
--- end)
+local id1
 
-runtime.addEventListener("resizeWindow", function(event)
+id1 = runtime.addEventListener("enterFrame", function(event)
+    print(event.time)
+    
+    if event.time > 2 then
+        runtime.removeEventListener("enterFrame", id1)
+    end
+end)
+
+local id2 = runtime.addEventListener("resizeWindow", function(event)
     print(event.width)
     print(event.height)
 end)
 
-print(1)
+print(id1, id2)

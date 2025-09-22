@@ -180,6 +180,8 @@ int main(int argc, char* argv[]) {
     }
 
     while (!glfwWindowShouldClose(window)) {
+        runtime.callEnterFrameEvents(1.0, 1, 1);
+        
         glfwPollEvents();
         glfwSwapBuffers(window);
     }

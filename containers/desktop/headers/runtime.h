@@ -63,3 +63,5 @@ class LxRuntime {
         std::vector<LxEvent> m_enterFrameEvents;
         std::vector<LxEvent> m_resizeWindowEvents;
 };
+
+static int l_get_proc_address(lua_State* L);

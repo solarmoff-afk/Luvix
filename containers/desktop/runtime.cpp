@@ -10,6 +10,21 @@
 
 #include "headers/runtime.h"
 
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
+
+extern "C" {
+    #ifdef _WIN32
+        __declspec(dllexport) void* get_glfw_proc_address() {
+            return (void*)glfwGetProcAddress;
+        }
+    #else        
+        __attribute__((visibility("default"))) void* get_glfw_proc_address() {
+            return (void*)glfwGetProcAddress;
+        }
+    #endif
+}
+
 /*
     Ключ для сохранения указателя в реестр
 */
@@ -116,6 +131,7 @@ int LxRuntime::boot(const std::string& bootFile) {
     registerGlobalTable("runtime", m_lua);
     addFunctionToTable("runtime", "addEventListener", LxRuntime::l_addEventListener, m_lua);
     addFunctionToTable("runtime", "removeEventListener", LxRuntime::l_removeEventListener, m_lua);
+    addFunctionToTable("runtime", "getProcAddress", l_get_proc_address, m_lua);
 
     luaL_dofile(m_lua, bootFile.c_str());
 
@@ -304,4 +320,10 @@ int LxRuntime::l_removeEventListener(lua_State* L) {
     }
 
     return 0;
+}
+
+static int l_get_proc_address(lua_State* L) {
+    void* proc_address = (void*)glfwGetProcAddress;
+    lua_pushlightuserdata(L, proc_address);
+    return 1;
 }

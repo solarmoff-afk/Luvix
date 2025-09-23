@@ -25,6 +25,8 @@ def create_bundle(project_dir, output_file, main_file):
         return
 
     bundle_template = f"""
+native_require = require
+
 local __bundleit__ = {{
     modules = {{}},
     loaded = {{}},
@@ -37,21 +39,24 @@ function __bundleit__.require(module_name)
         return __bundleit__.loaded[module_name]
     end
 
-    if not __bundleit__.modules[module_name] then
-        error("Module " .. module_name .. " not found in bundle")
+    if __bundleit__.modules[module_name] then
+        local module_code = __bundleit__.modules[module_name]
+        local func, err = load(module_code, module_name, "t")
+
+        if not func then
+            error("error loading module " .. module_name .. ":\\n" .. err)
+        end
+
+        local result = func()
+        __bundleit__.loaded[module_name] = result or true
+        return __bundleit__.loaded[module_name]
     end
 
-    local module_code = __bundleit__.modules[module_name]
-    local func, err = load(module_code, module_name, "t")
+    print(\"not found in bundle\")
 
-    if not func then
-        error("error loading module " .. module_name .. ":\\n" .. err)
-    end
-
-    local result = func()
-    __bundleit__.loaded[module_name] = result or true
-
-    return __bundleit__.loaded[module_name]
+    local result = native_require(module_name)
+    __bundleit__.loaded[module_name] = result
+    return result
 end
 
 require = __bundleit__.require

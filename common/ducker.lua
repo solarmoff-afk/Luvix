@@ -101,7 +101,7 @@ Ducker.RemoveObject = DuckerLib.DuckerNative_RemoveObject
 Ducker.DeleteFont = DuckerLib.DuckerNative_DeleteFont
 Ducker.DeleteTexture = DuckerLib.DuckerNative_DeleteTexture
 Ducker.DeleteShader = DuckerLib.DuckerNative_DeleteShader
-Ducker.EndContainer = DuckerLib.DuckerNative_EndContainer -- <--- ВОТ ЭТА ФУНКЦИЯ
+Ducker.EndContainer = DuckerLib.DuckerNative_EndContainer
 
 function Ducker.AddRect(bounds, color, zIndex, textureId, uvRect, borderWidth, borderColor)
     return DuckerLib.DuckerNative_AddRect(

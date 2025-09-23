@@ -42,10 +42,6 @@ static void addFunctionToTable(const char* tableName, const char* funcName, lua_
     lua_pop(L, 1);
 }
 
-/*
-    Конструктор по умолчанию
-*/
-
 LxRuntime::LxRuntime() {}
 
 /*
@@ -58,8 +54,9 @@ LxRuntime::~LxRuntime() {
 }
 
 /*
-    Загружает lua файл фреймворка, принимает путь к файлу и указатель
-    на GLFW окно для передачи информации о его размерах и так далее
+    Загружает lua файл фреймворка, принимает путь к файлу. Этот файл
+    (чаще всего бандл фреймворка, то есть все .lua файлы фреймворка
+    собранные в один для удобства запуска)
 */
 
 int LxRuntime::boot(const std::string& bootFile) {
@@ -74,15 +71,28 @@ int LxRuntime::boot(const std::string& bootFile) {
     }
 
     /*
-        Подкоючаем стандартные библиотеки lua, Такие как math.*,
-        system.*, os.*, io.* и так далее
+        Подключаем базовые библиотеки lua, Такие как math.*,
+        system.*, os.*, io.* и так далее. В Lua эти библиотеки
+        не включены из коробки и их необходимо подключить. Это
+        можно сделать вручную, но это не является гибким подходом.
+        Куда лучше использовать функцию luaL_openlibs из API lua,
+        она подключит все базовые библиотеки из версии Lua
+        которая используется
     */
 
     luaL_openlibs(m_lua);
 
     /*
-        Добавляем аддоны, их список:
-            1. utf8
+        Добавляем аддоны. Аддон в данном случае это библиотека,
+        которой нет в составе LuaJIT или оригинального lua. Они
+        являются только частью Luvix либо более поздних версий lua
+    */
+
+    /*
+        Этот аддон - официальный utf8 который является частью
+        lua 5.3, но отсутствует в LuaJIT. Требуется для работы
+        с символами, которые не поддерживает стандартный lua.
+        (Например, русский язык)
     */
 
     luaopen_utf8(m_lua);
@@ -97,7 +107,10 @@ int LxRuntime::boot(const std::string& bootFile) {
     lua_setfield(m_lua, LUA_REGISTRYINDEX, LX_RUNTIME_KEY);
 
     /*
-        Добавляем функции библиотеки Luvix runtime.*
+        Добавление функций библиотеки Luvix runtime.*
+        Глобальная таблица для функций, которые управляют временем
+        выполнения приложения. Т.е. : Добавляют и отключают слушатели,
+        возвращают актуальную информацию о окне/системе  
     */
 
     registerGlobalTable("runtime", m_lua);
@@ -153,7 +166,7 @@ void LxRuntime::safeCallListeners(std::vector<LxEvent>& listeners, const char* e
 }
 
 /*
-    Вызывает все зарегестрированные события обновления (Смены кадра)
+    Вызывает все зарегистрированные события обновления (Смены кадра)
     Вызов безопасный через метод safeCallListeners который
     позволяет избежать падение из-за неактуальности ссылки на функцию
     или рантайм ошибки во время выполнения самой функции (pcall)
@@ -169,7 +182,7 @@ void LxRuntime::callEnterFrameEvents(double time, int width, int height) {
 }
 
 /*
-    При изменении размеров окна вызываем соответсвующие слушатели
+    При изменении размеров окна вызываем соответствующие слушатели
 */
 
 void LxRuntime::callResizeWindowEvents(int width, int height) {
@@ -285,7 +298,7 @@ int LxRuntime::l_removeEventListener(lua_State* L) {
     if (strcmp(eventName, "enterFrame") == 0) {
         removeFromVector(&(runtime->m_enterFrameEvents), id);
     } else if (strcmp(eventName, "resizeWindow") == 0) {
-        removeFromVector(&(runtime->m_enterFrameEvents), id);
+        removeFromVector(&(runtime->m_resizeWindowEvents), id);
     } else {
         return luaL_error(L, "Unknown event type: %s", eventName);
     }

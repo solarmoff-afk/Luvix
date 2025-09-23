@@ -21,7 +21,7 @@ def create_bundle(project_dir, output_file, main_file):
                         modules[module_name] = content
 
     if not main_content:
-        print(f"Ошибка: Файл точка входа {main_file} не найден!")
+        print(f"Ошибка: Файл {main_file} не найден!")
         return
 
     bundle_template = f"""
@@ -38,7 +38,7 @@ function __bundleit__.require(module_name)
     end
 
     if not __bundleit__.modules[module_name] then
-        error("Модуль '" .. module_name .. "' не найден в бандле.")
+        error("Module " .. module_name .. " not found in bundle")
     end
 
     local module_code = __bundleit__.modules[module_name]

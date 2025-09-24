@@ -38,7 +38,7 @@ ffi.cdef[[
     void DuckerNative_Shutdown();
     void DuckerNative_Clear();
     void DuckerNative_SetScreenSize(int screenWidth, int screenHeight);
-    void DuckerNative_Render();
+    void DuckerNative_Render(float r, float g, float b);
 
     uint32_t DuckerNative_AddRect(RectF bounds, Vec4 color, int zIndex, uint32_t textureId, RectF uvRect, float borderWidth, Vec4 borderColor);
     uint32_t DuckerNative_AddRoundedRect(RectF bounds, Vec2 shapeSize, Vec4 color, float cornerRadius, float blur, bool inset, int zIndex, uint32_t textureId, RectF uvRect, float borderWidth, Vec4 borderColor);
@@ -70,7 +70,9 @@ ffi.cdef[[
     void DuckerNative_EndContainer();
 ]]
 
+print(123)
 local DuckerLib = ffi.load("DuckerNative")
+print(123)
 
 local Ducker = {}
 

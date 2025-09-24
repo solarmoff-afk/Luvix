@@ -2,6 +2,8 @@
 
 local ducker = require("ducker")
 
+print("Ducker import")
+
 local loader = runtime.getProcAddress()
 
 ducker.SetupGlad(loader)
@@ -21,8 +23,8 @@ local rectColor = {
 }
 
 local function onEnterFrame(event)
-    -- ducker.Clear()
-
+    ducker.Clear()
+    
     local rectX = (event.width - rectWidth) / 2
     local rectY = (event.height - rectHeight) / 2
     local rectBounds = {
@@ -32,13 +34,13 @@ local function onEnterFrame(event)
         h = rectHeight
     }
 
-    ducker.AddRect(
+    local id = ducker.AddRect(
         rectBounds,
         rectColor,
         0
     )
-    
-    ducker.Render()
+
+    ducker.Render(1.0, 1.0, 1.0)
 end
 
 local function onResize(event)

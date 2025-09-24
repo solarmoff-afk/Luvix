@@ -21,13 +21,13 @@ local rectColor = {
 }
 
 local function onEnterFrame(event)
-    ducker.Clear()
+    -- ducker.Clear()
 
     local rectX = (event.width - rectWidth) / 2
     local rectY = (event.height - rectHeight) / 2
     local rectBounds = {
         x = rectX,
-        y = rectY,
+        y = rectY + event.time * 20,
         w = rectWidth,
         h = rectHeight
     }
@@ -42,6 +42,7 @@ local function onEnterFrame(event)
 end
 
 local function onResize(event)
+    print(event.width, event.height)
     ducker.SetScreenSize(event.width, event.height)
 end
 

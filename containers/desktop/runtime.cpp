@@ -13,18 +13,6 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-extern "C" {
-    #ifdef _WIN32
-        __declspec(dllexport) void* get_glfw_proc_address() {
-            return (void*)glfwGetProcAddress;
-        }
-    #else        
-        __attribute__((visibility("default"))) void* get_glfw_proc_address() {
-            return (void*)glfwGetProcAddress;
-        }
-    #endif
-}
-
 /*
     Ключ для сохранения указателя в реестр
 */

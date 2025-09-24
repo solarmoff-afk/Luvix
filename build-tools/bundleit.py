@@ -52,8 +52,6 @@ function __bundleit__.require(module_name)
         return __bundleit__.loaded[module_name]
     end
 
-    print(\"not found in bundle\")
-
     local result = native_require(module_name)
     __bundleit__.loaded[module_name] = result
     return result

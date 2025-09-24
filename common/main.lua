@@ -24,14 +24,14 @@ local rectColor = {
 
 local function onEnterFrame(event)
     ducker.Clear()
-    
-    local rectX = (event.width - rectWidth) / 2
-    local rectY = (event.height - rectHeight) / 2
+
+    local rectX = 0
+    local rectY = 0
     local rectBounds = {
         x = rectX,
         y = rectY + event.time * 20,
-        w = rectWidth,
-        h = rectHeight
+        w = 6000,
+        h = event.height
     }
 
     local id = ducker.AddRect(

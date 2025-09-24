@@ -29,7 +29,7 @@ std::string getWindowTitleFromExecutable(char* argv0) {
 
 /*
     Переменные для хранения актуальных размеров окна
-    */
+*/
     
 int widthScreen = WINDOW_WIDTH;
 int heightScreen = WINDOW_HEIGHT;
@@ -54,10 +54,7 @@ void windowResize(int x, int y) {
     if (x < 1 || y < 1) { 
         return;
     }
-
-    // glViewport(0, 0, x, y);
 }
-
 
 /*
     Функция, которую GLFW автоматически вызывает при изменении размеров

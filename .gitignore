@@ -1,5 +1,7 @@
 containers/desktop/luvix-desktop.exe
 containers/desktop/build/
+containers/desktop/assets/
 containers/desktop/build.ninja
 containers/desktop/DuckerNative.dll
+containers/desktop/liana.dll
 containers/desktop/engine.bundle.lua

@@ -45,7 +45,10 @@ static void addFunctionToTable(const char* tableName, const char* funcName, lua_
     lua_pop(L, 1);
 }
 
-LxRuntime::LxRuntime() {}
+LxRuntime::LxRuntime() {
+    m_enterFrameEventRef = LUA_NOREF;
+    m_resizeEventRef = LUA_NOREF;
+}
 
 /*
     Деструктор который закрывает состояние Lua после смерти объекта
@@ -100,6 +103,18 @@ int LxRuntime::boot(const std::string& bootFile) {
 
     luaopen_utf8(m_lua);
     lua_setglobal(m_lua, "utf8");
+
+    /*
+        Создаём рефы на таблицы. Мы не можем себе позволить создавать новую таблицу
+        каждый раз когда вызывается ивент, так как это приведёт к нагрузке на
+        сборщик мусора lua и снижению производительности 
+    */
+
+    lua_newtable(m_lua);
+    m_enterFrameEventRef = luaL_ref(m_lua, LUA_REGISTRYINDEX);
+
+    lua_newtable(m_lua);
+    m_resizeEventRef = luaL_ref(m_lua, LUA_REGISTRYINDEX);
 
     /*
         Сохраняем указатель на текущий экземпляр LxRuntime в реестр,
@@ -178,7 +193,8 @@ void LxRuntime::safeCallListeners(std::vector<LxEvent>& listeners, const char* e
 
 void LxRuntime::callEnterFrameEvents(double time, int width, int height) {
     safeCallListeners(m_enterFrameEvents, "enterFrame", [&](lua_State* L) {
-        lua_newtable(L);
+        lua_rawgeti(L, LUA_REGISTRYINDEX, m_enterFrameEventRef);
+        
         lua_pushstring(L, "time"); lua_pushnumber(L, time); lua_settable(L, -3);
         lua_pushstring(L, "width"); lua_pushnumber(L, width); lua_settable(L, -3);
         lua_pushstring(L, "height"); lua_pushnumber(L, height); lua_settable(L, -3);
@@ -191,7 +207,7 @@ void LxRuntime::callEnterFrameEvents(double time, int width, int height) {
 
 void LxRuntime::callResizeWindowEvents(int width, int height) {
     safeCallListeners(m_resizeWindowEvents, "resizeWindow", [&](lua_State* L) {
-        lua_newtable(L);
+        lua_rawgeti(L, LUA_REGISTRYINDEX, m_resizeEventRef);
         lua_pushstring(L, "width"); lua_pushnumber(L, width); lua_settable(L, -3);
         lua_pushstring(L, "height"); lua_pushnumber(L, height); lua_settable(L, -3);
     });
@@ -203,7 +219,11 @@ void LxRuntime::callResizeWindowEvents(int width, int height) {
 
 void LxRuntime::close() {
     if (m_lua) {
+        luaL_unref(m_lua, LUA_REGISTRYINDEX, m_enterFrameEventRef);
+        luaL_unref(m_lua, LUA_REGISTRYINDEX, m_resizeEventRef);
+
         lua_close(m_lua);
+        m_lua = nullptr;
     }
 }
 

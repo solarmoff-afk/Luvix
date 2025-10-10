@@ -21,7 +21,7 @@ GLFW_DIR = os.path.join(EXTERNAL_DIR, "glfw")
 GLAD_DIR = os.path.join(EXTERNAL_DIR, "glad")
 LUAJIT_DIR = os.path.join(EXTERNAL_DIR, "luajit")
 
-COMMON_DEFS = "-DLUAJIT_DISABLE_DLL"
+COMMON_DEFS = "-DLUAJIT_DISABLE_DLL -DGLFW_STATIC"
 CXXFLAGS = f"-std=c++17 -Wall -Wextra -O2 {COMMON_DEFS}"
 CFLAGS = f"-Wall -Wextra {COMMON_DEFS}"
 INCLUDES = f"-I{os.path.join(GLFW_DIR, 'include')} -I{os.path.join(GLAD_DIR, 'include')} -I{os.path.join(LUAJIT_DIR, 'src')}"

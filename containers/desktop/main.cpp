@@ -77,10 +77,12 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 
 /*
     Эта переменная хранит в себе информацию, активирован ли режим
-    подробной отладки приложения
+    подробной отладки приложения и активирована ли вертикальная
+    синхронизация
 */
 
 bool verbose = false;
+bool vsync = true;
 
 /*
     Эта функция нужна для гибкости. В случае, если в сообщение
@@ -105,6 +107,8 @@ int main(int argc, char* argv[]) {
     for (const auto& arg : args) {
         if (arg == "--verbose") {
             verbose = true;
+        } else if (arg == "--no-vsync") {
+            vsync = false;
         }
     }
     
@@ -171,10 +175,13 @@ int main(int argc, char* argv[]) {
 
     /*
         Включает вертикальную синхронизацию, она не позволяет
-        FPS подниматься выше, чем герцовка монитора.
+        FPS подниматься выше, чем герцовка монитора. Только
+        если при запуске не указан флаг --no-vsync
     */
 
-    glfwSwapInterval(1);
+    if (vsync) {
+        glfwSwapInterval(1);
+    }
 
     /*
         Привязываем событие изменения окна к функции

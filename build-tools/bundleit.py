@@ -11,11 +11,11 @@ def create_bundle(project_dir, output_file, main_file):
                 file_path = os.path.join(root, file)
                 
                 module_name = os.path.relpath(file_path, project_dir)
-                module_name = module_name.replace(os.path.sep, ".")[:-4]
+                module_name = module_name.replace(os.path.sep, ".")[:-4].lower()
 
                 with open(file_path, "r", encoding="utf-8") as f:
                     content = f.read()
-                    if file == main_file:
+                    if file.lower() == main_file.lower():
                         main_content = content
                     else:
                         modules[module_name] = content
@@ -35,6 +35,8 @@ local __bundleit__ = {{
 {format_modules(modules)}
 
 function __bundleit__.require(module_name)
+    module_name = string.lower(module_name)
+
     if __bundleit__.loaded[module_name] then
         return __bundleit__.loaded[module_name]
     end

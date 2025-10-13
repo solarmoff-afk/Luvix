@@ -8,6 +8,8 @@
         Передавать актуальную информацию об окне
 */
 
+#include <cmath>
+
 #include "headers/runtime.h"
 
 #define GLFW_INCLUDE_NONE
@@ -135,6 +137,7 @@ int LxRuntime::boot(const std::string& bootFile) {
     addFunctionToTable("runtime", "addEventListener", LxRuntime::l_addEventListener, m_lua);
     addFunctionToTable("runtime", "removeEventListener", LxRuntime::l_removeEventListener, m_lua);
     addFunctionToTable("runtime", "getProcAddress", l_get_proc_address, m_lua);
+    addFunctionToTable("runtime", "getScreenInfo", l_getScreenInfo, m_lua);
 
     luaL_dofile(m_lua, bootFile.c_str());
 
@@ -328,6 +331,42 @@ int LxRuntime::l_removeEventListener(lua_State* L) {
     }
 
     return 0;
+}
+
+int LxRuntime::l_getScreenInfo(lua_State* L) {
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    if (!monitor) {
+        lua_pushnil(L);
+        return 1;
+    }
+
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+    int widthMM, heightMM;
+    glfwGetMonitorPhysicalSize(monitor, &widthMM, &heightMM);
+
+    double dpi = 96.0;
+
+    if (widthMM > 0 && heightMM > 0 && mode) {
+        double widthInches = static_cast<double>(widthMM) / 25.4;
+        double heightInches = static_cast<double>(heightMM) / 25.4;
+        double diagonalInches = std::sqrt(widthInches * widthInches + heightInches * heightInches);
+        double diagonalPixels = std::sqrt(mode->width * mode->width + mode->height * mode->height);
+
+        if (diagonalInches > 0) {
+            dpi = diagonalPixels / diagonalInches;
+        }
+    } else {
+        float xscale, yscale;
+        glfwGetMonitorContentScale(monitor, &xscale, &yscale);
+        dpi = 96.0 * xscale;
+    }
+    
+    lua_newtable(L);
+    lua_pushstring(L, "dpi");
+    lua_pushnumber(L, dpi);
+    lua_settable(L, -3);
+
+    return 1;
 }
 
 static int l_get_proc_address(lua_State* L) {

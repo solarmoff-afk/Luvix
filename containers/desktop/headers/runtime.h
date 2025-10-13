@@ -57,6 +57,7 @@ class LxRuntime {
         
         static int l_addEventListener(lua_State* L);
         static int l_removeEventListener(lua_State* L);
+        static int l_getScreenInfo(lua_State* L);
 
         void safeCallListeners(std::vector<LxEvent>& listeners, const char* eventName, std::function<void(lua_State*)> pushArgs);
 

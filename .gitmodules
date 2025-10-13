@@ -1,6 +1,3 @@
-[submodule "ducker"]
-	path = engine
-	url = https://github.com/solarmoff-afk/Ducker.git
 [submodule "containers/desktop/external/glfw"]
 	path = containers/desktop/external/glfw
 	url = https://github.com/solarmoff-afk/GLFW3.git

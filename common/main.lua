@@ -14,6 +14,16 @@ end
 -- runtime.addEventListener("enterFrame", onEnterFrame)
 runtime.addEventListener("resizeWindow", onResize)
 
+require("luvix.tableUtils").init(table)
+
+local baseWidgetFactory = require("luvix.baseWidgets.factory")
+
 pcall(function()
+    luvix = {}
+
+    luvix.Container = require("luvix.baseWidgets.container")
+    luvix.Text = baseWidgetFactory("text")
+    luvix.Rect = baseWidgetFactory("rect")
+
     navigator.gotoScreen("application") 
 end)

@@ -139,7 +139,25 @@ int LxRuntime::boot(const std::string& bootFile) {
     addFunctionToTable("runtime", "getProcAddress", l_get_proc_address, m_lua);
     addFunctionToTable("runtime", "getScreenInfo", l_getScreenInfo, m_lua);
 
-    luaL_dofile(m_lua, bootFile.c_str());
+    /*
+        Загружаеи чанк для проверки на синтаксические ошибки и выполняем его с проверкой
+        на панику Lua чтобы отладить, например, вызов функции которой нет (И другие случаи
+        который относятся к панике)
+    */
+
+    if (luaL_loadfile(m_lua, bootFile.c_str()) != LUA_OK) {
+        std::cerr << "Lua Boot Load Error: " << lua_tostring(m_lua, -1) << std::endl;
+        lua_pop(m_lua, 1);
+        close();
+        return -1;
+    }
+
+    if (lua_pcall(m_lua, 0, 0, 0) != LUA_OK) {
+        std::cerr << "Lua Execution Error: " << lua_tostring(m_lua, -1) << std::endl;
+        lua_pop(m_lua, 1);
+        close();
+        return -1;
+    }
 
     return 0;
 }

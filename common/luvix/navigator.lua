@@ -3,11 +3,11 @@ local M = {}
 local renderPass = require("luvix.render.renderPass")
 
 M.gotoScreen = function(path, args)
-    pcall(function()
+    -- pcall(function()
         local screen = require(path)
 
         --
-        -- TODO: В случаи пустого экрана (без функции M.build) вывести текст "Здесь ничего нет",
+        -- TODO: Если пустой экран (без функции M.build) вывести текст "Здесь ничего нет",
         -- изображение квокки и кнопку перехода на доки
         --
 
@@ -18,9 +18,11 @@ M.gotoScreen = function(path, args)
 
         local widgetTree = screen.build(args)
         
-        renderPass.currentTree
-        renderPass.previousTree
-    end)
+        renderPass.currentTree = widgetTree
+        renderPass.previousTree = {}
+
+        renderPass.update()
+    -- end)
 end
 
 return M

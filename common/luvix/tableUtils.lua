@@ -1,4 +1,4 @@
-return {init = function(object)
+return { init = function(object)
     function object.copy(source, seen_copies)
         if type(source) ~= "table" then
             return source
@@ -210,4 +210,4 @@ return {init = function(object)
             end
         end
     end
-end}
+end }

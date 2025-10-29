@@ -17,7 +17,7 @@
     Эта функция нужна для получения имени файла из аргумента. Это
     нужно чтобы дать окну такой заголовок, который соотвествует
     запускаемому файлу. Допустим:
-        Clicker.exe -> Заголвлок окна Clicker.exe
+        Clicker.exe -> Заголовлок окна Clicker.exe
 */
 
 std::string getWindowTitleFromExecutable(char* argv0) {

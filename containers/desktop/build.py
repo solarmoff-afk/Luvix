@@ -40,8 +40,26 @@ def generate_ninja_file():
         run_prefix = ""
     elif system == "Linux":
         target = "luvix-desktop"
-        ldflags = ""
-        libs = "-lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl"
+        
+        # GLFW
+        glfw_lib = os.path.join(GLFW_DIR, "lib", "libglfw3.a")
+        if not os.path.exists(glfw_lib):
+            print(f"ОШИБКА: Не найден {glfw_lib}")
+            sys.exit(1)
+        
+        # LuaJIT
+        luajit_lib = os.path.join(LUAJIT_DIR, "bin", "libluajit.a")
+        if not os.path.exists(luajit_lib):
+            print(f"ОШИБКА: Не найден {luajit_lib}")
+            print("   cd external/luajit && make && cp src/libluajit.a bin/")
+            sys.exit(1)
+        
+        # Путь
+        ldflags = f"-L{os.path.dirname(glfw_lib)} -L{os.path.dirname(luajit_lib)}"
+        
+        # ВАЖНО: libluajit.a ПОСЛЕДНИМ, и -lm -ldl
+        libs = f"{glfw_lib} -lGL -lX11 -lpthread -lXrandr -lXi -ldl -lm {luajit_lib}"
+        
         rm_cmd = f"rm -rf {target} {BUILD_DIR}"
         run_prefix = "./"
     elif system == "Darwin": # macOS
